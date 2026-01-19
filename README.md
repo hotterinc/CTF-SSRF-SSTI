@@ -1,21 +1,32 @@
-! You can use it only in educational purposes !
+# CTF Multi-App (SSRF + SSTI)
 
-# SSRF Server
-1) To run server:
-```cmd
-(optional) .venv\Scripts\activate
+This repo combines two CTF challenges into a single FastAPI app:
+- **SSRF**: URL fetcher with an internal target service on `127.0.0.1:9000`.
+- **SSTI**: simple profile/comments app with template injection.
+
+## Routes
+- `/` - landing page
+- `/ssrf` - SSRF challenge
+- `/ssti` - SSTI challenge
+
+The SSRF target service is started automatically inside the app and listens on `127.0.0.1:9000`.
+
+## Local run
+```bash
+python -m venv .venv
+source .venv/bin/activate
 pip install -r requirements.txt
-python server.py
-python target_server.py
+uvicorn server:app --reload
 ```
 
-2) Run Burp Suite or similar software
-3) Open http://127.0.0.1:8000 or http://localhost:8000 in Burp Browser
-4) Browser: Enter any valid URL in Fetch Box (e.g. https://soundcloud.com/keinemusik)
-5) Burp: Proxy -> HTTP History -> Find latest POST request (/fetch) from 127.0.0.1:8000 and add this request to Repeater (ctrl + R)
-6) Burp Repeater: Change url in Request body from https://soundcloud.com/keinemusik to http://127.0.0.1:8000
-7) Burp Repeater: Select 8000 with LMB and send it to Inrtuder (ctrl + I)
-8) Burp Intruder: Select Payload type -> Numbers -> Number range from 8990 to 9010 (to find it faster) -> Start attack
-9) Burp Intruder: Find port 9000 with status 200 OK. 
-10) Return to Repeater and replace URL with http://127.0.0.1:9000
-11) Find secret info at http://127.0.0.1:9000/secret
+Open: http://127.0.0.1:8000
+
+## Docker
+```bash
+docker build -t ctf .
+docker run -p 8000:8000 ctf
+```
+
+## Notes
+- The SSTI flag is stored at `/home/flag.txt` in the container (read-only).
+- User data is persisted to `users.csv` in the working directory.
