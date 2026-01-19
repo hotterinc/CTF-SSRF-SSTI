@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SSRF Vulnerable App</title>
+    <link href="/static/styles.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <h1>URL Fetcher</h1>
+        <p>Enter a URL to fetch its content:</p>
+        <form method="post" action="/fetch">
+            <input type="text" name="url" placeholder="https://example.com" required>
+            <button type="submit">Fetch</button>
+        </form>
+    </div>
+</body>
+</html>
