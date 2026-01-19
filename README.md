@@ -8,6 +8,7 @@ This repo combines two CTF challenges into a single FastAPI app:
 - `/` - landing page
 - `/ssrf` - SSRF challenge
 - `/ssti` - SSTI challenge
+- `/flags` - flag checker
 
 The SSRF target service is started automatically inside the app and listens on `127.0.0.1:9000`.
 

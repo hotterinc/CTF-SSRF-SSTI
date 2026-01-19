@@ -20,6 +20,13 @@ templates = Jinja2Templates(directory="templates")
 # --- SSRF target server ---
 TARGET_HOST = "127.0.0.1"
 TARGET_PORT = 9000
+SSRF_FLAG = "CTF{ssrf_0nly_l0calh0st_9000_7c2b3f}"
+SSTI_FLAG = "CTF{ssti_templ4te_escape_is_0pt1c4l_54d91b}"
+
+FLAG_HASHES = {
+    "ssrf": hashlib.sha256(SSRF_FLAG.encode()).hexdigest(),
+    "ssti": hashlib.sha256(SSTI_FLAG.encode()).hexdigest(),
+}
 
 
 class TargetHandler(BaseHTTPRequestHandler):
@@ -28,7 +35,7 @@ class TargetHandler(BaseHTTPRequestHandler):
             self.send_response(200)
             self.send_header("Content-Type", "text/plain")
             self.end_headers()
-            self.wfile.write(b"secret info")
+            self.wfile.write(SSRF_FLAG.encode())
         else:
             self.send_response(404)
             self.end_headers()
@@ -60,6 +67,28 @@ def shutdown() -> None:
 @app.get("/", response_class=HTMLResponse)
 async def landing(request: Request):
     return templates.TemplateResponse("home.html", {"request": request})
+
+
+@app.get("/flags", response_class=HTMLResponse)
+async def flags_page(request: Request, result: str | None = None):
+    return templates.TemplateResponse(
+        "flags.html",
+        {"request": request, "result": result},
+    )
+
+
+@app.post("/flags", response_class=HTMLResponse)
+async def flags_check(request: Request, flag: str = Form(...)):
+    submitted_hash = hashlib.sha256(flag.strip().encode()).hexdigest()
+    matched = next((name for name, digest in FLAG_HASHES.items() if digest == submitted_hash), None)
+    if matched:
+        result = f"Valid flag for: {matched.upper()}"
+    else:
+        result = "Invalid flag"
+    return templates.TemplateResponse(
+        "flags.html",
+        {"request": request, "result": result},
+    )
 
 
 # --- SSRF pages ---
@@ -199,7 +228,7 @@ async def profile_page(request: Request, profile_username: str):
             rendered = tmpl.render(
                 current_user=current_user,
                 users=users,
-                secret_key="SECRET_FLAG_CSV_EDITION",
+                secret_key=SSTI_FLAG,
             )
             processed_comments.append(rendered)
         except Exception:

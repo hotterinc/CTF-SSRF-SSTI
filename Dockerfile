@@ -11,7 +11,7 @@ COPY server.py .
 COPY templates ./templates
 COPY static ./static
 
-RUN echo "CTF{SSTI_is_fun_and_d4ng3r0us}" > /home/flag.txt \
+RUN echo "CTF{ssti_templ4te_escape_is_0pt1c4l_54d91b}" > /home/flag.txt \
     && chmod 444 /home/flag.txt
 
 RUN chown -R ctf:ctf /app
